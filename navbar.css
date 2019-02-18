@@ -1,0 +1,48 @@
+.navbar {
+    border-radius: 0 !important;
+}
+
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.nav-link {
+    color: #ff00ff94;
+}
+
+.nav-link:hover {
+    color: #ff00ff;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    /* remove scrollbar space */
+    background: transparent;
+    /* optional: just make scrollbar invisible */
+}
+
+/* optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+
+.navbar {
+    background-color: #ff00ff24;
+}
+
+.navbar-light .navbar-toggler {
+    border-color: #ff00ff;
+}
+
+.navbar-toggler:not(:disabled):not(.disabled) {
+    outline: none;
+}
+
+i {
+    font-family: 'Font Awesome 5 Free' !important;
+}
+
+.fa-bars {
+    color: #ff00ff;
+}

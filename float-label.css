@@ -1,0 +1,114 @@
+* {
+    transition: all .3s linear;
+    -webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    -o-transition: all .3s linear;
+}
+
+.card-title {
+    color: #ff00ff;
+    text-decoration: underline;
+    text-underline-position: under;
+    text-decoration-color: #ff00ffa6;
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+select:focus {
+    box-shadow: 0 0 5px #ff00ff;
+    border: 1px solid #ff00ff;
+    background-color: transparent;
+    caret-color: #ff00ff;
+    color: #ff00ff;
+}
+
+.form-control {
+    border: 1px solid #ff00ff63 !important;
+    background-color: transparent;
+}
+
+input::placeholder {
+    color: #ff00ff !important;
+}
+
+
+.mx-auto,
+.my-5,
+.bg-light {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.switch {
+    width: 100%;
+    border-bottom: 1px solid #ff00ff63;
+    background-color: #ff00ff24;
+}
+
+.switch-login {
+    width: 50%;
+    cursor: pointer;
+    color: #ff00ff;
+}
+
+.switch-register {
+    width: 50%;
+    cursor: pointer;
+    color: #ff00ff;
+}
+
+.bg-purple {
+    background-color: #ff00ffa6;
+    color: black;
+}
+
+.switch-login:not(.bg-purple):hover,
+.switch-register:not(.bg-purple):hover {
+    background-color: #ff00ff26;
+}
+
+input,
+.btn,
+select {
+    -moz-box-shadow: 5px 5px 4px 0px #ff00ff21;
+    -webkit-box-shadow: 5px 5px 4px 0px #ff00ff21;
+    box-shadow: 5px 5px 4px 0px #ff00ff21;
+}
+
+.btn {
+    background-color: #ff00ffa6;
+    border: 0;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #ff00ff;
+}
+
+.gone {
+    display: none;
+}
+
+.errorText {
+    font-size: x-small;
+    font-weight: bold;
+    color: red;
+    margin-bottom: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 0.5rem;
+}
+
+.form-row>.form-group>p {
+    margin-bottom: 0;
+}
+
+#register-form .form-control {
+    font-size: .85rem !important;
+}
+
+#login-form .form-control {
+    font-size: .9rem !important;
+}
