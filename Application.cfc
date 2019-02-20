@@ -15,6 +15,7 @@
         returntype="boolean"
         hint="I initialize the application.">
 
+
         <cfreturn true />
     </cffunction>
 
@@ -25,9 +26,10 @@
         hint="I initialize the session.">
 
         <cfset session.dateInitialized = now() />
-         <cfset session.loggedIn = 0 />
-         <cfset session.successMsg = "" />
-         <cfset session.errorMsg = "" />
+        <cfset session.loggedIn = 0 />
+        <cfset session.successMsg = "" />
+        <cfset session.errorMsg = "" />
+        <cfset session.DataSource = "TIO_TEST" />
 
 
         <!--- Return out. --->
