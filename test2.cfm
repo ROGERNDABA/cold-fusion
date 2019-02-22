@@ -35,10 +35,9 @@
         }
 
         #map {
-            height: 100%;
+            height: 50%;
             float: left;
-            width: 70%;
-            height: 100%;
+            width: 50%;
         }
 
         #right-panel {
@@ -75,14 +74,13 @@
 
         <cfquery name="myQuery" datasource="TIO_TEST">
             SELECT *
-            FROM Suppliers
-            WHERE SupplierName
-            (LIKE '%#WayPoints[1]#%'
-            <cfloop array="#WayPoints#" index="i">
-                OR SupplierName
-                LIKE '%#i#%')
-            </cfloop>
-            AND Deleted = 0
+            FROM za.Suppliers
+            WHERE Deleted = 0
+            AND SupplierID IN (66,
+            497,
+            769,
+            1376,
+            3201)
 
         </cfquery>
 
@@ -96,37 +94,44 @@
                 var CoOrdinates = [{
                         "WayPoint": "Cape Town International Airport",
                         "latitude": -33.97109385,
-                        "longitude": 18.602054242774337
+                        "longitude": 18.602054242774337,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "The Cape Grace",
                         "latitude": -33.9087014,
-                        "longitude": 18.4204936
+                        "longitude": 18.4204936,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "Cape Town Rail Station",
-                        "latitude": -33.924445,
-                        "longitude": 18.4317089
+                        "latitude": -33.9205558,
+                        "longitude": 18.4262217,
+                        "TravelMode": "TRANSIT"
                     },
                     {
                         "WayPoint": "Rovos Rail Station Pretoria",
                         "latitude": -25.7176659,
-                        "longitude": 28.1905657
+                        "longitude": 28.1905657,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "Bongani Mountain Lodge",
                         "latitude": -25.4599251,
-                        "longitude": 31.2899048
+                        "longitude": 31.2899048,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "SANP: KNP Olifants Rest Camp",
                         "latitude": -23.943,
-                        "longitude": 31.14110000000005
+                        "longitude": 31.14110000000005,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "Southern Sun O.R Tambo Intl Airport Hotel",
                         "latitude": -26.134674699999998,
-                        "longitude": 28.227372647610082
+                        "longitude": 28.227372647610082,
+                        "TravelMode": "DRIVING"
                     },
                     {
                         "WayPoint": "O.R Tambo Intl Airport",
@@ -135,126 +140,117 @@
                     }
                 ]
 
+                function BuildMultipleWayPoints(Array) {
+                    var WayPointsCollection = [];
+                    var SubWayPointCollection = [];
+
+                    for (let index = 0; index < Array.length - 1; index++) {
+                        const Element = Array[index];
+                        const Element2 = Array[index + 1]
+                        if (Element.TravelMode == Element2.TravelMode)
+                            SubWayPointCollection.push(Element);
+                        else {
+                            SubWayPointCollection.push(Element);
+                            SubWayPointCollection.push(Element2);
+                            WayPointsCollection.push(SubWayPointCollection);
+                            SubWayPointCollection = [];
+                        }
+                    }
+                    return WayPointsCollection;
+                }
+
+                // console.log(BuildMultipleWayPoints(CoOrdinates));
+
                 function initMap() {
                     var directionsService = new google.maps.DirectionsService;
                     var directionsDisplay = new google.maps.DirectionsRenderer;
                     var map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 6,
                         center: {
-                            lat: Math.floor(CoOrdinates[0].latitude) + 0.5,
-                            lng: Math.floor(CoOrdinates[0].longitude) + 0.5
-                        }
+                            lat: -34.2969541,
+                            lng: 18.2479026
+                        },
+                        gestureHandling: 'greedy'
                     });
                     directionsDisplay.setMap(map);
-                    calculateAndDisplayRoute(directionsService, directionsDisplay);
+                    var MultipleWayPoints = BuildMultipleWayPoints(CoOrdinates).reverse();
+                    calculateAndDisplayRoute(MultipleWayPoints, map);
                 }
 
-                function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-                    var WayPoints = [];
-                    for (let index = 1; index < CoOrdinates.length - 1; index++) {
-                        const key = CoOrdinates[index];
-                        WayPoints.push({
-                            location: new google.maps.LatLng(key.latitude, key.longitude),
-                            stopover: true
-                        })
-                        // console.log(`long: ${key.longitude}\nlat: ${key.latitude}`);
+                async function calculateAndDisplayRoute(MultipleWayPoints, map) {
+                    directionsServices = [];
+                    directionsDisplays = [];
 
-                    };
+                    var RouteColors = ['#00ff0c', '#ff00ff', '#00faff', '#ffaa00', '#ff0015'];
+                    var ColorIndex = 0;
+
+                    for (i = 0; i < MultipleWayPoints.length; i++) {
+
+                        var Routes = MultipleWayPoints[i];
+                        var RouteWayPoints = []
+
+                        for (let index = 0; index < Routes.length; index++) {
+                            const key = Routes[index];
+                            RouteWayPoints.push({
+                                location: new google.maps.LatLng(key.latitude, key.longitude),
+                                stopover: true
+                            })
+                        };
+
+                        directionsServices[i] = new google.maps.DirectionsService();
+                        var Start = RouteWayPoints[0].location;
+                        var End = RouteWayPoints[RouteWayPoints.length - 1].location;
+
+                        var request = {
+                            origin: Start,
+                            destination: End,
+                            waypoints: RouteWayPoints.slice(1, RouteWayPoints.length - 1),
+                            optimizeWaypoints: true,
+                            travelMode: Routes[0].TravelMode
+                        };
+
+                        // console.log(RouteWayPoints.slice(1, RouteWayPoints.length - 1));
 
 
-                    var WP1 = new google.maps.LatLng(-33.97109385, 18.602054242774337)
-                    directionsService.route({
-                        origin: WayPoints[0].location,
-                        destination: WayPoints[WayPoints.length - 1].location,
-                        waypoints: WayPoints.slice(1, WayPoints.length - 1),
-                        optimizeWaypoints: true,
-                        travelMode: 'DRIVING'
-                    }, function (response, status) {
-                        if (status === 'OK') {
-                            directionsDisplay.setDirections(response);
-                            var route = response.routes[0];
-                        } else {
-                            window.alert('Directions request failed due to ' + status);
-                        }
-                    });
+                        directionsServices[i].route(request, async function (response, status) {
+                            await response;
+                            console.log(response);
+                            var PreserveViewport = (i == 0) ? true : false;
+                            console.log(PreserveViewport);
 
-                    // directionsService.route({
-                    //     origin: WayPoints[0].location,
-                    //     destination: WayPoints[1].location,
-                    //     // waypoints: WayPoints.slice(1, WayPoints.length - 1),
-                    //     optimizeWaypoints: true,
-                    //     travelMode: 'DRIVING'
-                    // }, function (response, status) {
-                    //     if (status === 'OK') {
-                    //         directionsDisplay.setDirections(response);
-                    //         directionsDisplay.setMap(map);
-                    //         var route = response.routes[0];
-                    //     } else {
-                    //         window.alert('Directions request failed due to ' + status);
-                    //     }
-                    // });
-                    // directionsService.route({
-                    //     origin: WayPoints[4].location,
-                    //     destination: WayPoints[5].location,
-                    //     // waypoints: WayPoints.slice(1, WayPoints.length - 1),
-                    //     optimizeWaypoints: true,
-                    //     travelMode: 'DRIVING'
-                    // }, function (response, status) {
-                    //     if (status === 'OK') {
-                    //         directionsDisplay.setDirections(response);
-                    //         var route = response.routes[0];
-                    //     } else {
-                    //         window.alert('Directions request failed due to ' + status);
-                    //     }
-                    // });
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsDisplays.push(new google.maps.DirectionsRenderer({
+                                    preserveViewport: PreserveViewport,
+                                    polylineOptions: {
+                                        strokeColor: RouteColors[ColorIndex],
+                                        strokeOpacity: 0.5,
+                                        strokeWeight: 5
+                                    }
+                                }));
+                                directionsDisplays[directionsDisplays.length - 1].setMap(map);
+                                directionsDisplays[directionsDisplays.length - 1].setDirections(
+                                    response);
+                            } else {
+                                // console.log(i);
+
+                                PathArray = new google.maps.MVCArray([
+                                    response.request.origin.location,
+                                    response.request.destination.location
+                                ]);
+
+                                var PolyLine = new google.maps.Polyline({
+                                    path: PathArray,
+                                    geodesic: true,
+                                    strokeColor: RouteColors[ColorIndex],
+                                    strokeOpacity: 0.5,
+                                    strokeWeight: 5
+                                })
+                                PolyLine.setMap(map);
+                            }
+                            ColorIndex = (ColorIndex == RouteColors.length - 1) ? 0 : ColorIndex + 1;
+                        });
+                    }
                 }
-
-
-
-
-
-                // var directionsDisplay;
-                //     var directionsService = new google.maps.DirectionsService();
-                //     var map;
-                //     var locations1 = [["route1", "", 43.152068, -79.165230, 43.117574, -79.247694],
-                //     ["route2", "", 43.096214, -79.037739, 42.8864468, -78.8783689],
-                //     ];
-
-
-                //     function initialize() {
-                //         directionsDisplay = new google.maps.DirectionsRenderer();
-                //         var awal = new google.maps.LatLng(43, -79);
-                //         var mapOptions = {
-                //             zoom: 10,
-                //             center: awal
-                //         }
-                //         map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-                //         directionsDisplay.setMap(map);
-                //         var i;
-                //         directionsServices = [];
-                //         directionsDisplays = [];
-                //         for (i = 0; i < locations1.length; i++) {
-                //             directionsServices[i] = new google.maps.DirectionsService();
-                //             var start = new google.maps.LatLng(locations1[i][2], locations1[i][3]);
-                //             var end = new google.maps.LatLng(locations1[i][4], locations1[i][5]);
-
-                //             var request = {
-                //                 origin: start,
-                //                 destination: end,
-                //                 optimizeWaypoints: true,
-                //                 travelMode: google.maps.TravelMode.DRIVING
-                //             };
-
-                //             directionsServices[i].route(request, function (response, status) {
-                //                 if (status == google.maps.DirectionsStatus.OK) {
-                //                     directionsDisplays.push(new google.maps.DirectionsRenderer({ preserveViewport: true }));
-                //                     directionsDisplays[directionsDisplays.length - 1].setMap(map);
-                //                     directionsDisplays[directionsDisplays.length - 1].setDirections(response);
-                //                 } else alert("Directions request failed:" + status);
-                //             });
-                //         }
-                //     }
-                //     google.maps.event.addDomListener(window, 'load', initialize);
             </script>
             <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyB_FQrvDn9JgPvApBnO_9RvGp8P-EJ189g&language=en&region=JP&callback=initMap">
             </script>
