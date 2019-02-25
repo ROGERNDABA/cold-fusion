@@ -90,7 +90,7 @@ async function calculateAndDisplayRoute(MultipleWayPoints, map) {
     directionsServices = [];
     directionsDisplays = [];
 
-    var RouteColors = ['#00ff0c', '#ff00ff', '#00faff', '#ffaa00', '#ff0015', '#a100ff', '#e9ff00', '#009104'];
+    var RouteColors = ['#00ff0c', '#ff00ff', '#ff0015', '#ffaa00', '#00faff', '#a100ff', '#e9ff00', '#009104'];
     var ColorIndex = 0;
 
     for (i = 0; i < MultipleWayPoints.length; i++) {
